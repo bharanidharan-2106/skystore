@@ -1,0 +1,153 @@
+.folder-browser {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 8px;
+    border-radius: 4px;
+}
+
+.breadcrumb-item:hover {
+    background: #e9ecef;
+}
+
+.breadcrumb-separator {
+    margin: 0 8px;
+    color: #6c757d;
+}
+
+.current-location {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.current-location h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.current-location p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.folders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.folder-item {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.folder-item:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.folder-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.folder-info h5 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 14px;
+    word-break: break-word;
+    text-align: center;
+}
+
+.folder-info p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 12px;
+    text-align: center;
+}
+
+.protected-badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #e65100;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-top: 5px;
+    text-align: center;
+    width: 100%;
+}
+
+.files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    margin: 10px 0;
+}
+
+.empty-state p:first-child {
+    font-size: 18px;
+    font-weight: bold;
+}

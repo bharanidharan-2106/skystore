@@ -1,0 +1,69 @@
+.file-explorer {
+    padding: 20px;
+    background: #f8f9fa;
+    min-height: 500px;
+    border-radius: 8px;
+}
+
+.explorer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.explorer-header h2 {
+    margin: 0;
+    color: #333;
+    white-space: nowrap;
+    font-size: 24px;
+}
+
+.explorer-header button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    min-width: auto;
+    width: auto;
+}
+
+.explorer-header button:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #666;
+}
+
+.files-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    margin: 5px 0;
+    font-size: 16px;
+}

@@ -1,0 +1,182 @@
+.share-access {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  padding: 20px;
+}
+
+.share-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.share-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.share-container h1 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.share-container h2 {
+  color: #34495e;
+  margin: 20px 0 10px;
+  font-size: 22px;
+  word-break: break-word;
+}
+
+.share-info {
+  margin-top: 24px;
+  font-size: 16px;
+  color: #4a5568;
+  text-align: left;
+}
+
+.share-meta {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+  border-left: 4px solid #007bff;
+}
+
+.share-meta p {
+  margin: 8px 0;
+  color: #4a5568;
+}
+
+.share-meta strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.password-protected {
+  color: #e53e3e;
+  font-weight: 500;
+  margin-top: 12px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.password-form {
+  margin-top: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.password-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-top: 8px;
+}
+
+.password-input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.error-message {
+  color: #e53e3e;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: left;
+}
+
+.download-shared-btn {
+  margin-top: 24px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.download-shared-btn:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+.download-shared-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.download-shared-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.loading, .error {
+  color: #2d3748;
+  font-size: 16px;
+  margin: 24px 0;
+  padding: 16px;
+  border-radius: 6px;
+  background: #f8f9fa;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error {
+  color: #e53e3e;
+  background: #fff5f5;
+  border-left: 4px solid #e53e3e;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .share-container {
+    padding: 24px 20px;
+  }
+  
+  .share-container h1 {
+    font-size: 24px;
+  }
+  
+  .share-container h2 {
+    font-size: 20px;
+  }
+  
+  .share-info {
+    font-size: 15px;
+  }
+  
+  .download-shared-btn {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}
