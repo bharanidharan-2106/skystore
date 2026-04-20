@@ -34,7 +34,7 @@ async function findFileById(fileId, userId, username) {
     try {
         // Try new folder format
         let s3Params = {
-            Bucket: "skystore-files001",
+            Bucket: process.env.S3_BUCKET,
             Prefix: `users/${userFolder}/`
         };
         
@@ -61,13 +61,13 @@ async function findFileById(fileId, userId, username) {
                 name: fileName,
                 originalName: fileName,
                 s3Key: s3File.Key,
-                s3Url: `https://skystore-files001.s3.ap-south-1.amazonaws.com/${s3File.Key}`,
+                s3Url: `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3File.Key}`,
                 size: s3File.Size,
                 mimeType: 'application/octet-stream',
                 isProtected: false,
                 password: null,
                 uploadedAt: s3File.LastModified,
-                s3Bucket: "skystore-files001"
+                s3Bucket: process.env.S3_BUCKET
             };
         }
     } catch (error) {
@@ -119,13 +119,13 @@ router.post('/upload', auth, upload.single('file'), async (req, res) => {
         const fileKey = `users/${userFolder}/${fileId}-${fileName.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
         
         console.log('📍 S3 Upload Details:');
-        console.log('  - Bucket: skystore-files001');
+        console.log('  - Bucket:', process.env.S3_BUCKET);
         console.log('  - Key:', fileKey);
         console.log('  - File size:', req.file.size, 'bytes');
 
-        // Upload to S3 - FIXED: Using direct bucket name
+        // Upload to S3 - FIXED: Using env variable
         const s3Params = {
-            Bucket: "skystore-files001",  // ✅ Direct bucket name
+            Bucket: process.env.S3_BUCKET,  // ✅ Dynamic bucket name
             Key: fileKey,
             Body: req.file.buffer,
             ContentType: req.file.mimetype,
@@ -155,7 +155,7 @@ router.post('/upload', auth, upload.single('file'), async (req, res) => {
             isProtected: isProtected,
             password: isProtected ? password : null,
             uploadedAt: new Date(),
-            s3Bucket: "skystore-files001"
+            s3Bucket: process.env.S3_BUCKET
         };
 
         // Store in memory
@@ -166,7 +166,7 @@ router.post('/upload', auth, upload.single('file'), async (req, res) => {
             message: 'File uploaded successfully to S3!', 
             file: fileData,
             s3Info: {
-                bucket: "skystore-files001",
+                bucket: process.env.S3_BUCKET,
                 key: fileKey,
                 location: s3Result.Location
             }
@@ -178,7 +178,7 @@ router.post('/upload', auth, upload.single('file'), async (req, res) => {
         
         // More detailed error info
         if (error.code === 'NoSuchBucket') {
-            res.status(500).json({ error: 'S3 bucket does not exist: skystore-files00' });
+            res.status(500).json({ error: `S3 bucket does not exist: ${process.env.S3_BUCKET}` });
         } else if (error.code === 'AccessDenied') {
             res.status(500).json({ error: 'AWS access denied. Check your credentials.' });
         } else if (error.code === 'InvalidAccessKeyId') {
@@ -202,7 +202,7 @@ router.get('/my-files', auth, async (req, res) => {
         
         // List objects from S3 for this user
         const s3Params = {
-            Bucket: "skystore-files001",
+            Bucket: process.env.S3_BUCKET,
             Prefix: `users/${userFolder}/`
         };
         
@@ -219,7 +219,7 @@ router.get('/my-files', auth, async (req, res) => {
         // Also check old folder format for backward compatibility
         if (s3Files.length === 0) {
             const oldS3Params = {
-                Bucket: "skystore-files001",
+                Bucket: process.env.S3_BUCKET,
                 Prefix: `users/${oldUserFolder}/`
             };
             
@@ -250,13 +250,13 @@ router.get('/my-files', auth, async (req, res) => {
                 name: memoryFile?.name || fileName,
                 originalName: memoryFile?.originalName || fileName,
                 s3Key: s3File.Key,
-                s3Url: `https://skystore-files001.s3.amazonaws.com/${s3File.Key}`,
+                s3Url: `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${s3File.Key}`,
                 size: s3File.Size,
                 mimeType: memoryFile?.mimeType || 'application/octet-stream',
                 isProtected: memoryFile?.isProtected || false,
                 password: memoryFile?.password || null,
                 uploadedAt: memoryFile?.uploadedAt || s3File.LastModified,
-                s3Bucket: "skystore-files001"
+                s3Bucket: process.env.S3_BUCKET
             };
         });
         
@@ -315,7 +315,7 @@ router.post('/verify-password/:fileId', auth, async (req, res) => {
         
         // Generate presigned URL for download
         const params = {
-            Bucket: "skystore-files001",
+            Bucket: process.env.S3_BUCKET,
             Key: file.s3Key,
             Expires: 300 // 5 minutes
         };
@@ -355,7 +355,7 @@ router.get('/download/:fileId', auth, async (req, res) => {
 
         // Generate presigned URL for download
         const params = {
-            Bucket: "skystore-files001",
+            Bucket: process.env.S3_BUCKET,
             Key: file.s3Key,
             Expires: 300 // 5 minutes
         };
@@ -388,7 +388,7 @@ router.delete('/:fileId', auth, async (req, res) => {
         // Delete from S3
         console.log('🗑️ Deleting from S3:', file.s3Key);
         await s3.deleteObject({
-            Bucket: "skystore-files001",
+            Bucket: process.env.S3_BUCKET,
             Key: file.s3Key
         }).promise();
 

@@ -315,7 +315,7 @@ router.get('/download/:shareToken', async (req, res) => {
         
         // Get the file from S3
         const params = {
-            Bucket: file.s3Bucket || 'skystore-files001',
+            Bucket: file.s3Bucket || process.env.S3_BUCKET,
             Key: file.s3Key
         };
         
