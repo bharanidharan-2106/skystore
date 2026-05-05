@@ -96,7 +96,7 @@ function FileUpload({ onUploadComplete }) {
                                     onChange={(e) => setIsProtected(e.target.checked)}
                                     className="protection-checkbox"
                                 />
-                                <span className="protection-text">🔒 Password Protect this File</span>
+                                <span className="protection-text">Password Protect this File</span>
                             </label>
                             
                             {isProtected && (
@@ -121,7 +121,7 @@ function FileUpload({ onUploadComplete }) {
                             disabled={uploading || (isProtected && !password)}
                             className="upload-btn"
                         >
-                            {uploading ? '⏳ Uploading...' : 'Upload File'}
+                            {uploading ? 'Uploading...' : 'Upload File'}
                         </button>
                     </div>
                 )}

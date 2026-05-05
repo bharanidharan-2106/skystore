@@ -37,11 +37,9 @@ function App() {
         <Router>
             <div className="App">
                 <Routes>
-                    <Route path="/login" element={!isAuthenticated ? <Login onLogin={handleAuth} /> : <Navigate to="/dashboard" />} />
-                    <Route path="/register" element={!isAuthenticated ? <Register onRegister={handleAuth} /> : <Navigate to="/dashboard" />} />
-                    <Route path="/dashboard" element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />} />
-                    <Route path="/share/:shareToken" element={<ShareAccess />} />
-                    <Route path="/" element={<Navigate to="/login" />} />
+                    <Route path="/dashboard" element={<Dashboard isAuthenticated={isAuthenticated} onLogin={handleAuth} onLogout={handleLogout} />} />
+                    <Route path="/share/:shareToken" element={<ShareAccess isAuthenticated={isAuthenticated} onLogin={handleAuth} />} />
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </div>
         </Router>

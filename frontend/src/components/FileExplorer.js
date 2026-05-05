@@ -7,10 +7,10 @@ import FileSearch from './FileSearch';
 import { showError } from '../utils/errorHandler';
 import './FileExplorer.css';
 
-function FileExplorer() {
+function FileExplorer({ searchTerm, activeTab }) {
     const [files, setFiles] = useState([]);
+    const [sharedFileIds, setSharedFileIds] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const fetchFiles = async () => {
         try {
@@ -18,13 +18,15 @@ function FileExplorer() {
             const token = getToken();
             
             const response = await axios.get(`${API_BASE_URL}/files/my-files`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            console.log('📁 Files:', response.data);
             setFiles(response.data.files || []);
+
+            // Also fetch the user's actually-shared file IDs
+            const sharesRes = await axios.get(`${API_BASE_URL}/sharing/my-shares`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setSharedFileIds(sharesRes.data.sharedFileIds || []);
 
         } catch (error) {
             showError(error, 'Failed to load files');
@@ -69,10 +71,35 @@ function FileExplorer() {
         console.log('Share link created successfully');
     };
 
-    // Filter files based on search
-    const filteredFiles = files.filter(file => 
-        file.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter and Sort files based on active tab and search term
+    const getProcessedFiles = () => {
+        let processed = [...files];
+
+        // Search filter
+        if (searchTerm) {
+            processed = processed.filter(file =>
+                file.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Tab-specific logic
+        switch (activeTab) {
+            case 'recent':
+                // Sort newest first
+                processed.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+                break;
+            case 'shared':
+                // Only show files the user has actually created a share link for
+                processed = processed.filter(file => sharedFileIds.includes(file.id));
+                break;
+            default:
+                break;
+        }
+
+        return processed;
+    };
+
+    const filteredFiles = getProcessedFiles();
 
     useEffect(() => {
         fetchFiles();
@@ -80,21 +107,8 @@ function FileExplorer() {
 
     return (
         <div className="file-explorer">
-            <div className="explorer-header">
-                <h2>📁 My Files</h2>
-                <button onClick={fetchFiles} disabled={loading}>
-                    {loading ? 'Loading...' : 'Refresh'}
-                </button>
-            </div>
-
-            {/* Search Component */}
-            <FileSearch 
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-            />
-
             {loading ? (
-                <div className="loading">🔄 Loading files...</div>
+                <div className="loading">Loading files...</div>
             ) : (
                 <div className="files-grid">
                     {filteredFiles.length > 0 ? (
@@ -110,18 +124,12 @@ function FileExplorer() {
                     ) : (
                         <div className="empty-state">
                             <div className="empty-icon">
-                                {searchTerm ? '🔍' : '📭'}
+                                Empty
                             </div>
                             <p>
                                 {searchTerm 
                                     ? `No files found for "${searchTerm}"`
-                                    : 'No files uploaded yet'
-                                }
-                            </p>
-                            <p>
-                                {searchTerm 
-                                    ? 'Try a different search term'
-                                    : 'Upload your first file using the upload form'
+                                    : 'No files content yet'
                                 }
                             </p>
                         </div>

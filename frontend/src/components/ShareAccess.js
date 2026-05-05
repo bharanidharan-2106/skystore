@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { getToken } from '../utils/auth';
 import { showError, showSuccess } from '../utils/errorHandler';
+import AuthModal from './AuthModal';
 import './ShareAccess.css';
 
-function ShareAccess() {
+function ShareAccess({ isAuthenticated, onLogin }) {
     const { shareToken } = useParams();
     const navigate = useNavigate();
     const [shareInfo, setShareInfo] = useState(null);
@@ -15,55 +17,61 @@ function ShareAccess() {
     const [password, setPassword] = useState('');
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [passwordError, setPasswordError] = useState('');
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+    const accessShare = useCallback(async () => {
+        try {
+            setLoading(true);
+            const token = getToken();
+            const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+            
+            const response = await axios.get(`${API_BASE_URL}/sharing/access/${shareToken}`, config);
+            
+            if (response.data.share) {
+                setShareInfo(response.data.share);
+                setFileInfo(response.data.file);
+                setShowPasswordForm(false);
+            }
+        } catch (error) {
+            if (error.response?.status === 401 && error.response.data.isPasswordProtected) {
+                setShowPasswordForm(true);
+                setShareInfo({ isPasswordProtected: true });
+            } else {
+                showError(error, 'Failed to access shared file');
+                setShareInfo(null);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [shareToken]);
 
     useEffect(() => {
-        const accessShare = async () => {
-            try {
-                const response = await axios.get(`${API_BASE_URL}/sharing/access/${shareToken}`);
-                
-                if (response.data.error === 'Password required') {
-                    setShowPasswordForm(true);
-                    setShareInfo({ isPasswordProtected: true });
-                } else if (response.data.share) {
-                    setShareInfo(response.data.share);
-                    setFileInfo(response.data.file);
-                } else {
-                    // Handle other cases (e.g., expired, not found)
-                    showError({ message: response.data.error || 'Failed to access shared file' });
-                }
-            } catch (error) {
-                if (error.response?.data?.isPasswordProtected) {
-                    setShowPasswordForm(true);
-                    setShareInfo({ isPasswordProtected: true });
-                } else {
-                    showError(error, 'Failed to access shared file');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
         accessShare();
-    }, [shareToken]);
-    
+    }, [accessShare, isAuthenticated]); // Re-fetch when auth status changes
+
+    const handleAuthSuccess = () => {
+        if (onLogin) onLogin();
+        setIsAuthModalOpen(false);
+        // accessShare will be re-triggered by useEffect
+    };
+
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
         setPasswordError('');
         
         try {
-            const response = await axios.post(
-                `${API_BASE_URL}/sharing/verify-password/${shareToken}`, 
-                { password }
+            const token = getToken();
+            const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+            
+            const response = await axios.get(
+                `${API_BASE_URL}/sharing/access/${shareToken}?password=${encodeURIComponent(password)}`,
+                config
             );
             
-            if (response.data.verified) {
-                // Reload the share info with the verified token
-                const shareResponse = await axios.get(`${API_BASE_URL}/sharing/access/${shareToken}?password=${encodeURIComponent(password)}`);
-                setShareInfo(shareResponse.data.share);
-                setFileInfo(shareResponse.data.file);
+            if (response.data.share) {
+                setShareInfo(response.data.share);
+                setFileInfo(response.data.file);
                 setShowPasswordForm(false);
-            } else {
-                setPasswordError('Incorrect password. Please try again.');
             }
         } catch (error) {
             setPasswordError(error.response?.data?.error || 'Failed to verify password');
@@ -71,65 +79,39 @@ function ShareAccess() {
     };
 
     const handleDownload = async () => {
+        if (!isAuthenticated) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
         try {
             setDownloading(true);
-            
-            // If password is required but not yet verified, show password form
-            if (shareInfo?.isPasswordProtected && !password) {
-                setShowPasswordForm(true);
-                return;
-            }
+            const token = getToken();
             
             // Get download URL from backend
             const response = await axios.get(
                 `${API_BASE_URL}/sharing/download/${shareToken}${password ? `?password=${encodeURIComponent(password)}` : ''}`,
-                { responseType: 'blob' }
+                { 
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    responseType: 'blob' 
+                }
             );
             
-            // Handle direct file download (blob)
             if (response.data instanceof Blob) {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
-                const contentDisposition = response.headers['content-disposition'];
-                let fileName = 'download';
-                
-                if (contentDisposition) {
-                    const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                    if (fileNameMatch && fileNameMatch[1]) {
-                        fileName = fileNameMatch[1].replace(/['"]/g, '');
-                    }
-                }
-                
                 link.href = url;
-                link.setAttribute('download', fileName);
+                link.setAttribute('download', fileInfo?.name || 'download');
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
                 showSuccess('Download started!');
-            } 
-            // Handle S3 pre-signed URL
-            else if (response.data.downloadUrl) {
-                window.open(response.data.downloadUrl, '_blank');
-                showSuccess('Download started!');
             }
-            
         } catch (error) {
-            if (error.response?.status === 401) {
-                // Password required or incorrect
-                setShowPasswordForm(true);
-                if (error.response.data?.isPasswordProtected) {
-                    setPasswordError('Password is required to access this file');
-                } else {
-                    setPasswordError('Incorrect password. Please try again.');
-                }
-            } else if (error.response?.status === 403) {
-                showError(error, 'You do not have download permission for this file');
-            } else if (error.response?.status === 404) {
-                showError(error, 'File not found or has been deleted');
-            } else if (error.response?.status === 410) {
-                showError(error, 'This share link has expired');
+            if (error.response?.status === 403) {
+                showError(null, 'You only have viewing permission for this file.');
             } else {
-                showError(error, 'Download failed. Please try again.');
+                showError(error, 'Download failed');
             }
         } finally {
             setDownloading(false);
@@ -139,8 +121,32 @@ function ShareAccess() {
     if (loading) {
         return (
             <div className="share-access">
-                <div className="share-container">
-                    <div className="loading">Loading shared file...</div>
+                <div className="share-container loader-view">
+                    <div className="loading-spinner"></div>
+                    <p>Fetching shared file securely...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // If not authenticated, we still show the page BUT hide the file contents/details 
+    // OR we can just show the AuthModal overlay if they try to access.
+    // However, the user said "If other user click that shared link... if not they must login".
+    // So I'll show a "Login Required" card if they aren't authenticated.
+    
+    if (!isAuthenticated && !loading) {
+        return (
+            <div className="share-access">
+                <div className="share-container auth-gate">
+                    <div className="gate-icon">🔐</div>
+                    <h1>Login to Access File</h1>
+                    <p>Secure file sharing requires you to be logged into your SkyStore account.</p>
+                    <button className="gate-login-btn" onClick={() => setIsAuthModalOpen(true)}>Log In to View File</button>
+                    <AuthModal 
+                        isOpen={isAuthModalOpen} 
+                        onClose={() => navigate('/dashboard')} 
+                        onAuthSuccess={handleAuthSuccess}
+                    />
                 </div>
             </div>
         );
@@ -149,85 +155,94 @@ function ShareAccess() {
     if (!shareInfo) {
         return (
             <div className="share-access">
-                <div className="share-container">
-                    <div className="error">Share link not found or expired</div>
+                <div className="share-container error-view">
+                    <h1>⚠️ Link Expired or Invalid</h1>
+                    <p>This share link is no longer active or may have been deleted by the owner.</p>
+                    <button onClick={() => navigate('/dashboard')} className="back-btn">Go to Dashboard</button>
                 </div>
             </div>
         );
     }
 
-    // Show password form if password is required
     if (showPasswordForm) {
         return (
             <div className="share-access">
-                <div className="share-container">
-                    <h1>🔒 Password Required</h1>
-                    <div className="share-info">
-                        <p>This file is password protected. Please enter the password to continue.</p>
-                        
-                        <form onSubmit={handlePasswordSubmit} className="password-form">
-                            <div className="form-group">
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter password"
-                                    required
-                                    className="password-input"
-                                />
-                                {passwordError && <div className="error-message">{passwordError}</div>}
-                            </div>
-                            <button 
-                                type="submit" 
-                                className="download-shared-btn"
-                                disabled={!password}
-                            >
-                                Continue
-                            </button>
-                        </form>
-                    </div>
+                <div className="share-container password-gate">
+                    <h1>🔒 Password Protected</h1>
+                    <p>Please enter the secret password provided by the owner to unlock this file.</p>
+                    <form onSubmit={handlePasswordSubmit} className="password-form">
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="File password"
+                            required
+                        />
+                        {passwordError && <div className="error-text">{passwordError}</div>}
+                        <button type="submit" className="unlock-btn">Unlock File</button>
+                    </form>
                 </div>
             </div>
         );
     }
 
+    const canDownload = shareInfo?.permission === 'view_download';
+
     return (
         <div className="share-access">
-            <div className="share-container">
-                <h1>🔗 Shared File</h1>
-                <div className="share-info">
-                    {fileInfo ? (
-                        <>
-                            <h2>{fileInfo.name}</h2>
-                            <p><strong>Size:</strong> {formatFileSize(fileInfo.size)}</p>
-                            <p><strong>Type:</strong> {fileInfo.type || 'Unknown'}</p>
-                            <p><strong>Uploaded:</strong> {new Date(fileInfo.createdAt).toLocaleDateString()}</p>
-                        </>
-                    ) : (
-                        <h2>Shared File</h2>
-                    )}
-                    
-                    <div className="share-meta">
-                        <p><strong>Permission:</strong> {shareInfo.permission === 'view' ? 'View Only' : 'View & Edit'}</p>
-                        <p><strong>Access Count:</strong> {shareInfo.accessCount || 0}</p>
-                        <p><strong>Expires:</strong> {new Date(shareInfo.expiresAt).toLocaleDateString()}</p>
-                        {shareInfo.isPasswordProtected && <p className="password-protected">🔒 Password Protected</p>}
+            <div className="share-container main-view">
+                <div className="share-header">
+                    <div className="share-file-icon">📄</div>
+                    <div className="share-title-group">
+                        <h1>{fileInfo?.name || 'Shared File'}</h1>
+                        <span className="share-badge">{shareInfo?.permission === 'view_only' ? '👁️ View Only' : '⬇️ View & Download'}</span>
                     </div>
-                    
-                    <button 
-                        onClick={handleDownload}
-                        disabled={downloading}
-                        className="download-shared-btn"
-                    >
-                        {downloading ? 'Downloading...' : '⬇️ Download File'}
-                    </button>
+                </div>
+
+                <div className="file-preview-card">
+                    <div className="preview-meta">
+                        <div className="meta-item">
+                            <label>Owner</label>
+                            <span>SkyStore User</span>
+                        </div>
+                        <div className="meta-item">
+                            <label>File Size</label>
+                            <span>{formatFileSize(fileInfo?.size || 0)}</span>
+                        </div>
+                        <div className="meta-item">
+                            <label>Expires on</label>
+                            <span>{new Date(shareInfo?.expiresAt).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+
+                    <div className="share-actions">
+                        {canDownload ? (
+                            <button 
+                                onClick={handleDownload}
+                                disabled={downloading}
+                                className="main-download-btn"
+                            >
+                                {downloading ? 'Preparing Download...' : 'Download File'}
+                            </button>
+                        ) : (
+                            <div className="view-only-notice">
+                                <p>You have permission to view this file metadata only. Downloading is restricted by the owner.</p>
+                            </div>
+                        )}
+                        <button onClick={() => navigate('/dashboard')} className="secondary-btn">Go to my Dashboard</button>
+                    </div>
                 </div>
             </div>
+            
+            <AuthModal 
+                isOpen={isAuthModalOpen} 
+                onClose={() => setIsAuthModalOpen(false)} 
+                onAuthSuccess={handleAuthSuccess}
+            />
         </div>
     );
 }
 
-// Helper function to format file size
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;

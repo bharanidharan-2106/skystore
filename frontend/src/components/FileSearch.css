@@ -1,190 +1,58 @@
-/* FileSearch.css */
-
 .file-search {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
     width: 100%;
 }
 
 .search-container {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
 }
 
 .search-input {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    color: #4a5568;
-    background-color: #f8fafc;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.5rem 1rem 3.5rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    font-size: 1.05rem;
+    color: var(--text-main);
+    transition: all 0.3s;
 }
 
 .search-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: rgba(15, 23, 42, 0.7);
+    border-color: var(--primary);
+    box-shadow: 0 0 40px -10px var(--primary-glow);
 }
 
 .search-input::placeholder {
-    color: #94a3b8;
+    color: var(--text-dim);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 1.25rem;
+    pointer-events: none;
 }
 
 .clear-search {
     position: absolute;
-    right: 0.75rem;
+    right: 1.25rem;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: rgba(255, 255, 255, 0.05);
     border: none;
-    color: #94a3b8;
+    color: var(--text-dim);
     cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 9999px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.clear-search:hover {
-    color: #64748b;
-    background-color: #e2e8f0;
-}
-
-/* Share button styles */
-.share-btn {
-    background: none;
-    border: 1px solid #ddd;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease;
-}
-
-.share-btn:hover {
-    background: #17a2b8;
-    color: white;
-    border-color: #17a2b8;
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 450px;
-}
-
-.modal h3 {
-    margin-top: 0;
-    color: #333;
-    text-align: center;
-}
-
-.share-form .form-group {
-    margin: 15px 0;
-}
-
-.share-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #333;
-}
-
-.share-form select, .share-form input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.cancel-btn {
-    flex: 1;
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.create-btn {
-    flex: 1;
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.create-btn:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-.share-result {
-    text-align: center;
-}
-
-.share-link {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-}
-
-.link-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #f8f9fa;
-}
-
-.copy-btn {
-    background: #17a2b8;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.close-btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
 }

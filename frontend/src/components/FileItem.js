@@ -9,7 +9,7 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
     const [sharing, setSharing] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [shareLink, setShareLink] = useState('');
-    const [permission, setPermission] = useState('view');
+    const [permission, setPermission] = useState('view_only');
     const [expiresIn, setExpiresIn] = useState(7); // 7 days
     const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
     const [password, setPassword] = useState('');
@@ -125,7 +125,7 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
         <>
             <div className="file-item">
                 <div className="file-icon">
-                    {file.isProtected ? '🔒' : '📄'}
+                    {file.isProtected ? 'Protected' : 'File'}
                 </div>
                 <div className="file-info">
                     <div className="file-name">{file.name}</div>
@@ -135,7 +135,7 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
                     </div>
                     {file.isProtected && (
                         <div className="protected-badge">
-                            🔒 Password Protected
+                            Password Protected
                         </div>
                     )}
                 </div>
@@ -143,24 +143,21 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
                     <button 
                         onClick={handleDownload} 
                         className="download-btn"
-                        title="Download"
                     >
-                        ⬇️
+                        Download
                     </button>
                     <button 
                         onClick={handleShare} 
                         className="share-btn"
-                        title="Share"
                     >
-                        🔗
+                        Share
                     </button>
                     <button 
                         onClick={handleDelete} 
                         disabled={deleting}
                         className="delete-btn"
-                        title="Delete"
                     >
-                        {deleting ? '🗑️...' : '🗑️'}
+                        {deleting ? 'Deleting...' : 'Delete'}
                     </button>
                 </div>
             </div>
@@ -169,7 +166,7 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
             {showPasswordPrompt && (
                 <div className="password-prompt-overlay">
                     <div className="password-prompt">
-                        <h3>🔒 Protected File</h3>
+                        <h3>Protected File</h3>
                         <p>Enter password to download: <strong>{file.name}</strong></p>
                         
                         <input
@@ -203,7 +200,7 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
             {showShareModal && (
                 <div className="modal-overlay">
                     <div className="modal">
-                        <h3>🔗 Share File</h3>
+                        <h3>Share File</h3>
                         <p>Share: <strong>{file.name}</strong></p>
                         
                         {!shareLink ? (
@@ -213,9 +210,10 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
                                     <select 
                                         value={permission} 
                                         onChange={(e) => setPermission(e.target.value)}
+                                        className="share-permission-select"
                                     >
-                                        <option value="view">View Only (Can download)</option>
-                                        <option value="edit">View & Edit (Can download and modify)</option>
+                                        <option value="view_only">View Only</option>
+                                        <option value="view_download">View and Download</option>
                                     </select>
                                 </div>
                                 
@@ -242,7 +240,7 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
                         ) : (
                             <div className="share-result">
                                 <p>Share link created!</p>
-                                <div className="share-link">
+                                <div className="share-link-wrapper">
                                     <input 
                                         type="text" 
                                         value={shareLink} 
@@ -250,10 +248,13 @@ function FileItem({ file, onDelete, onDownload, onShareCreated }) {
                                         className="link-input"
                                     />
                                     <button onClick={copyToClipboard} className="copy-btn">
-                                        📋
+                                        Copy
                                     </button>
                                 </div>
-                                <button onClick={() => setShowShareModal(false)} className="close-btn">
+                                <button onClick={() => {
+                                    setShowShareModal(false);
+                                    setShareLink('');
+                                }} className="close-btn">
                                     Close
                                 </button>
                             </div>

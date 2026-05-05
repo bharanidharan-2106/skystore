@@ -1,0 +1,10 @@
+{
+  "name": "skystore-root",
+  "version": "1.0.0",
+  "description": "Root directory for SkyStore",
+  "scripts": {
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm start --prefix frontend",
+    "dev": "npx -y concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
+  }
+}

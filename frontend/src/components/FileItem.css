@@ -1,282 +1,223 @@
 .file-item {
+    background: var(--glass-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 0.85rem 1.25rem;
     display: flex;
     align-items: center;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background: white;
-    transition: all 0.3s ease;
+    gap: 1rem;
+    transition: all 0.25s ease;
 }
 
 .file-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateX(4px);
 }
 
 .file-icon {
-    font-size: 24px;
-    margin-right: 15px;
+    width: 40px;
+    height: 40px;
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    flex-shrink: 0;
 }
 
 .file-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
 }
 
 .file-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .file-details {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 5px;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.45);
 }
 
 .protected-badge {
-    display: inline-block;
-    background: #fff3cd;
-    color: #856404;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    border: 1px solid #ffeaa7;
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    width: fit-content;
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .file-actions {
     display: flex;
-    gap: 10px;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
-.download-btn, .delete-btn, .share-btn {
-    background: none;
-    border: 1px solid #ddd;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease;
+.file-actions button {
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.download-btn {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .download-btn:hover {
-    background: #007bff;
+    background: var(--primary);
     color: white;
-    border-color: #007bff;
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+.share-btn {
+    background: rgba(139, 92, 246, 0.1);
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .share-btn:hover {
-    background: #17a2b8;
+    background: #8b5cf6;
     color: white;
-    border-color: #17a2b8;
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+}
+
+.delete-btn {
+    background: rgba(244, 63, 94, 0.1);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.2);
 }
 
 .delete-btn:hover {
-    background: #dc3545;
+    background: #f43f5e;
     color: white;
-    border-color: #dc3545;
+    box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4);
 }
 
-.delete-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Password Prompt Styles */
-.password-prompt-overlay {
+/* Modals & Overlays */
+.modal-overlay, .password-prompt-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(16px);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     z-index: 1000;
+    padding: 2rem;
 }
 
-.password-prompt {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 400px;
-}
-
-.password-prompt h3 {
-    margin-top: 0;
-    color: #333;
-    text-align: center;
-}
-
-.password-prompt p {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #666;
-}
-
-.password-input {
+.modal, .password-prompt {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 3rem;
+    border-radius: 32px;
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-bottom: 15px;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 25px 70px -12px rgba(0, 0, 0, 0.6);
 }
 
-.button-group {
+.modal h3, .password-prompt h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+}
+
+.modal p, .password-prompt p {
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+}
+
+.password-input, .link-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.1rem 1.4rem;
+    border-radius: 16px;
+    color: white;
+    width: 100%;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.password-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.button-group, .modal-actions {
     display: flex;
-    gap: 10px;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.button-group button, .modal-actions button {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 14px;
+    font-weight: 700;
 }
 
 .cancel-btn {
-    flex: 1;
-    padding: 12px;
-    background: #6c757d;
+    background: rgba(255, 255, 255, 0.05);
     color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
-.cancel-btn:hover {
-    background: #5a6268;
-}
-
-.verify-btn {
-    flex: 1;
-    padding: 12px;
-    background: #28a745;
+.verify-btn, .create-btn {
+    background: var(--primary);
     color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.verify-btn:hover:not(:disabled) {
-    background: #218838;
-}
-
-.verify-btn:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 450px;
-}
-
-.modal h3 {
-    margin-top: 0;
-    color: #333;
-    text-align: center;
-}
-
-.share-form .form-group {
-    margin: 15px 0;
-}
-
-.share-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #333;
-}
-
-.share-form select, .share-form input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.cancel-btn {
-    flex: 1;
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.create-btn {
-    flex: 1;
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.create-btn:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-.share-result {
-    text-align: center;
-}
-
-.share-link {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-}
-
-.link-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #f8f9fa;
-}
-
-.copy-btn {
-    background: #17a2b8;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .close-btn {
-    background: #007bff;
+    background: var(--primary);
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
     width: 100%;
+    padding: 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    margin-top: 1rem;
+}
+
+.share-link-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.copy-btn {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--primary);
+    padding: 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.copy-btn:hover {
+    background: var(--primary);
+    color: white;
 }
